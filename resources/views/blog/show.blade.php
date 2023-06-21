@@ -4,6 +4,7 @@
 <div class="container">
     <h2>Blog - {{$post->title}}</h2>
     <hr>
+
     <div class="card mb-3 mt-3">
         <div class="card-body">
             <h2 class="card-title">{{$post->title}}</h2>
@@ -22,17 +23,51 @@
         </div>
     </div>
 
-    <!-- The comment function is disabled because it is not fully implemented yet -->
+    @if (session()->has('message'))
+        <h4 class="font-weight-bold text-success">{{session()->get('message')}}</h4>
+    @endif
+
+    <h3>Kommentare</h3>
+    @if (isset($comments))
+        @foreach ($comments as $comment)
+            <div class="card mb-3 mt-3">
+                <div class="card-body">
+                    <h2 class="card-title">Von {{$comment->user->name}}</h2>
+                    <p class="card-text">{{$comment->comment}}</p>
+                    @if (isset(Auth::user()->id) && Auth::user()->id == $comment->user_id)
+                        <div class="card-footer">
+                            <form action="/comment/{{$comment->id}}" method="POST">
+                                @csrf
+                                @method('delete')
+                                <button type="submit" class="btn btn-danger">Löschen</button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endforeach
+    @endif
+
+    <hr>
+
     @if (Auth::check())
-        <form action="/comments" method="POST">
+        @if ($errors->any())
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li class="text-danger">{{$error}}</li>
+                @endforeach
+            </ul>
+        @endif
+        <form action="/comment" method="POST">
             @csrf
             <div class="mb-3">
                 <input type="hidden" name="post_id" value="{{$post->id}}">
-                <label for="comment" class="form-label">Kommentar (nicht verfügbar)</label>
-                <textarea type="text" class="form-control" name="comment" id="comment"></textarea>
+                <label for="comment" class="form-label">Kommentar schreiben:</label>
+                <textarea type="text" class="form-control @error('comment') is-invalid @enderror" name="comment" id="comment"></textarea>
             </div>
-            <button type="submit" class="btn btn-success disabled">Speichern</button>
+            <button type="submit" class="btn btn-success">Speichern</button>
         </form>
     @endif
+
 </div>
 @endsection

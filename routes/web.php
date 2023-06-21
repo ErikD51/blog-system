@@ -19,7 +19,7 @@ use App\Http\Controllers\CommentsController;
 Route::get('/', [PagesController::class, 'index']);
 
 Route::resource('/blog', PostsController::class);
-Route::resource('/comments', CommentsController::class);
+Route::resource('/comment', CommentsController::class);
 
 Auth::routes();
 

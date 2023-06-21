@@ -33,12 +33,12 @@ class CommentsController extends Controller
         ]);
 
         Comment::create([
-            'name' => auth()->user()->id,
             'comment' => $request->input('comment'),
             'post_id' => $request->input('post_id'),
+            'user_id' => auth()->user()->id,
         ]);
 
-        return redirect('/blog')->with('message', 'Kommentar wurde hinzugefügt!');
+        return redirect()->back()->with('message', 'Kommentar wurde hinzugefügt!');
     }
 
     /**
@@ -70,6 +70,9 @@ class CommentsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $comment = Comment::where('id', $id);
+        $comment->delete();
+
+        return redirect()->back()->with('message', 'Dein Kommentar wurde gelöscht!');
     }
 }
